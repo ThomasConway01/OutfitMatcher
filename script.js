@@ -129,14 +129,25 @@ class OutfitMatcher {
 
         // Check if API key is properly set
         if (!this.apiKey || this.apiKey === 'GEMINI_API_KEY_PLACEHOLDER') {
-            resultDiv.innerHTML = `
-                <div class="error-content">
-                    <h3>❌ API Key Missing</h3>
-                    <p>API key not configured. Please check your GitHub secrets.</p>
-                </div>
-            `;
-            loadingDiv.style.display = 'none';
-            return;
+            // Try to get API key from user as fallback
+            const userApiKey = prompt('GitHub secrets not working. Please enter your Gemini API key:');
+            if (userApiKey && userApiKey.trim().length > 10) {
+                this.apiKey = userApiKey.trim();
+                localStorage.setItem('gemini_api_key', this.apiKey);
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="error-content">
+                        <h3>❌ API Key Missing</h3>
+                        <p>GitHub secrets not configured properly. Please:</p>
+                        <ol style="text-align: left; margin: 1rem 0;">
+                            <li>Check your GEMINI_API_KEY secret in GitHub</li>
+                            <li>Or refresh and enter your API key when prompted</li>
+                        </ol>
+                    </div>
+                `;
+                loadingDiv.style.display = 'none';
+                return;
+            }
         }
 
         const prompt = `Look at this image and tell me what clothing items you can see. Then suggest one outfit combination from these items. Keep it brief and simple.`;
