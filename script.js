@@ -3,7 +3,9 @@ console.log('Written By Thomas Conway');
 
 class OutfitMatcher {
     constructor() {
-        this.apiKey = 'GEMINI_API_KEY_PLACEHOLDER';
+        this.apiKey = 'OPENROUTER_API_KEY_PLACEHOLDER';
+        this.textModel = 'anthropic/claude-3.5-sonnet';
+        this.imageModel = 'black-forest-labs/flux-schnell';
         this.currentStream = null;
         this.init();
     }
@@ -128,9 +130,9 @@ class OutfitMatcher {
         resultDiv.innerHTML = '';
 
         // Check if API key is properly set
-        if (!this.apiKey || this.apiKey === 'GEMINI_API_KEY_PLACEHOLDER') {
+        if (!this.apiKey || this.apiKey === 'OPENROUTER_API_KEY_PLACEHOLDER') {
             // Check localStorage first
-            const storedKey = localStorage.getItem('gemini_api_key');
+            const storedKey = localStorage.getItem('openrouter_api_key');
             if (storedKey && storedKey.trim().length > 10) {
                 this.apiKey = storedKey.trim();
             } else {
@@ -138,14 +140,14 @@ class OutfitMatcher {
                 resultDiv.innerHTML = `
                     <div class="error-content">
                         <h3>❌ API Key Missing</h3>
-                        <p>GitHub secrets not configured properly.</p>
+                        <p>OpenRouter API key not configured.</p>
                         <div style="margin: 1rem 0; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
                             <p><strong>To fix this:</strong></p>
                             <ol style="text-align: left; margin: 0.5rem 0;">
-                                <li>Get your API key from <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: var(--cyber-primary);">Google AI Studio</a></li>
+                                <li>Get your API key from <a href="https://openrouter.ai/keys" target="_blank" style="color: var(--cyber-primary);">OpenRouter Console</a></li>
                                 <li>Enter it below:</li>
                             </ol>
-                            <input type="password" id="tempApiKey" placeholder="Paste your Gemini API key here" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0; background: var(--cyber-bg); border: 2px solid var(--cyber-border); color: var(--cyber-text); border-radius: 4px;">
+                            <input type="password" id="tempApiKey" placeholder="Paste your OpenRouter API key here" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0; background: var(--cyber-bg); border: 2px solid var(--cyber-border); color: var(--cyber-text); border-radius: 4px;">
                             <button onclick="window.outfitMatcher.setTempApiKey()" style="padding: 0.5rem 1rem; background: var(--cyber-primary); color: var(--cyber-bg); border: none; border-radius: 4px; cursor: pointer;">Save & Try Again</button>
                         </div>
                     </div>
@@ -158,32 +160,38 @@ class OutfitMatcher {
         const aiPrompt = `Look at this image and tell me what clothing items you can see. Then suggest one outfit combination from these items. Keep it brief and simple.`;
 
         const requestBody = {
-            contents: [{
-                parts: [
-                    { text: aiPrompt },
-                    {
-                        inline_data: {
-                            mime_type: "image/jpeg",
-                            data: base64Image
+            model: this.textModel,
+            messages: [
+                {
+                    role: "user",
+                    content: [
+                        {
+                            type: "text",
+                            text: aiPrompt
+                        },
+                        {
+                            type: "image_url",
+                            image_url: {
+                                url: `data:image/jpeg;base64,${base64Image}`
+                            }
                         }
-                    }
-                ]
-            }],
-            generationConfig: {
-                temperature: 0.7,
-                topK: 40,
-                topP: 0.95,
-                maxOutputTokens: 512
-            }
+                    ]
+                }
+            ],
+            max_tokens: 512,
+            temperature: 0.7
         };
 
         try {
-            console.log('Making API request to Gemini...');
+            console.log('Making API request to OpenRouter...');
             
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
+            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Content-Type': 'application/json',
+                    'HTTP-Referer': window.location.origin,
+                    'X-Title': 'Outfit Matcher'
                 },
                 body: JSON.stringify(requestBody)
             });
@@ -203,8 +211,8 @@ class OutfitMatcher {
                 throw new Error(`API Error: ${data.error.message || 'Unknown error'}`);
             }
             
-            if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
-                const text = data.candidates[0].content.parts[0].text;
+            if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+                const text = data.choices[0].message.content;
                 
                 resultDiv.innerHTML = `
                     <div class="result-content">
@@ -293,7 +301,7 @@ class OutfitMatcher {
         const input = document.getElementById('tempApiKey');
         if (input && input.value && input.value.trim().length > 10) {
             this.apiKey = input.value.trim();
-            localStorage.setItem('gemini_api_key', this.apiKey);
+            localStorage.setItem('openrouter_api_key', this.apiKey);
             
             // Clear the input and show success
             input.value = '';
@@ -363,28 +371,31 @@ class OutfitMatcher {
             
             Please provide a helpful, specific answer about the outfit. Keep it conversational and brief. Focus on practical fashion advice.`;
             
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
+            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Content-Type': 'application/json',
+                    'HTTP-Referer': window.location.origin,
+                    'X-Title': 'Outfit Matcher'
                 },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: contextPrompt }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.8,
-                        topK: 40,
-                        topP: 0.95,
-                        maxOutputTokens: 256
-                    }
+                    model: this.textModel,
+                    messages: [
+                        {
+                            role: "user",
+                            content: contextPrompt
+                        }
+                    ],
+                    max_tokens: 256,
+                    temperature: 0.8
                 })
             });
             
             const data = await response.json();
             
-            if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
-                const aiResponse = data.candidates[0].content.parts[0].text;
+            if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+                const aiResponse = data.choices[0].message.content;
                 
                 // Add AI response to chat
                 const aiMessageDiv = document.createElement('div');
@@ -431,41 +442,96 @@ class OutfitMatcher {
         visualizationContainer.scrollIntoView({ behavior: 'smooth' });
         
         try {
-            // Create a detailed prompt for image generation
-            const visualPrompt = `Create a detailed description for an AI image generator of this outfit: "${this.currentOutfit}"
-            
-            Describe it as a fashion illustration or realistic outfit photo showing the complete look. Include colors, styles, and how the pieces work together. Make it suitable for an AI image generator prompt.`;
-            
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
+            // First, create a detailed prompt using the text model
+            const promptCreationResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Content-Type': 'application/json',
+                    'HTTP-Referer': window.location.origin,
+                    'X-Title': 'Outfit Matcher'
                 },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: visualPrompt }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        topK: 40,
-                        topP: 0.95,
-                        maxOutputTokens: 512
-                    }
+                    model: this.textModel,
+                    messages: [
+                        {
+                            role: "user",
+                            content: `Create a detailed, visual prompt for AI image generation based on this outfit analysis: "${this.currentOutfit}"
+
+                            Make it a concise but descriptive prompt for generating a fashion illustration or realistic outfit photo. Focus on:
+                            - Specific clothing items and their colors
+                            - Style and fit details
+                            - How pieces work together
+                            - Professional fashion photography style
+                            
+                            Keep it under 100 words and suitable for FLUX image generation.`
+                        }
+                    ],
+                    max_tokens: 200,
+                    temperature: 0.7
                 })
             });
             
-            const data = await response.json();
+            const promptData = await promptCreationResponse.json();
             
-            if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
-                const imageDescription = data.candidates[0].content.parts[0].text;
+            if (!promptData.choices || !promptData.choices[0] || !promptData.choices[0].message) {
+                throw new Error('Failed to create image prompt');
+            }
+            
+            const imagePrompt = promptData.choices[0].message.content.trim();
+            console.log('Generated image prompt:', imagePrompt);
+            
+            // Now generate the actual image using FLUX
+            const imageResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Content-Type': 'application/json',
+                    'HTTP-Referer': window.location.origin,
+                    'X-Title': 'Outfit Matcher'
+                },
+                body: JSON.stringify({
+                    model: this.imageModel,
+                    messages: [
+                        {
+                            role: "user",
+                            content: imagePrompt
+                        }
+                    ],
+                    max_tokens: 1,
+                    temperature: 0.7
+                })
+            });
+            
+            const imageData = await imageResponse.json();
+            console.log('Image generation response:', imageData);
+            
+            // Check if we got an image URL back
+            if (imageData.choices && imageData.choices[0] && imageData.choices[0].message && imageData.choices[0].message.content) {
+                const imageUrl = imageData.choices[0].message.content.trim();
                 
-                // For now, show the description since we can't generate actual images with Gemini
+                // Display the generated image
                 resultDiv.innerHTML = `
                     <div class="result-content">
-                        <h3>🎨 Outfit Visualization Description</h3>
-                        <div class="result-text">${this.formatResult(imageDescription)}</div>
+                        <h3>🎨 Generated Outfit Visualization</h3>
+                        <div style="margin: 1rem 0;">
+                            <img src="${imageUrl}" alt="Generated outfit visualization" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,255,255,0.3);">
+                        </div>
+                        <div class="result-text">
+                            <p><strong>Prompt used:</strong> ${imagePrompt}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Fallback to showing the prompt if image generation fails
+                resultDiv.innerHTML = `
+                    <div class="result-content">
+                        <h3>🎨 Outfit Visualization Prompt</h3>
+                        <div class="result-text">${this.formatResult(imagePrompt)}</div>
                         <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
-                            <p><strong>💡 Pro Tip:</strong> Copy this description and use it with AI image generators like:</p>
+                            <p><strong>💡 Image generation is processing...</strong></p>
+                            <p>The FLUX model is generating your outfit visualization. This may take a moment.</p>
+                            <p>You can also copy this prompt and use it with other AI image generators:</p>
                             <ul style="text-align: left; margin: 0.5rem 0;">
                                 <li><a href="https://www.midjourney.com" target="_blank" style="color: var(--cyber-primary);">Midjourney</a></li>
                                 <li><a href="https://openai.com/dall-e-2" target="_blank" style="color: var(--cyber-primary);">DALL-E</a></li>
@@ -474,20 +540,20 @@ class OutfitMatcher {
                         </div>
                     </div>
                 `;
-                
-                const regenerateBtn = document.getElementById('regenerateVisualizationBtn');
-                if (regenerateBtn) {
-                    regenerateBtn.style.display = 'inline-flex';
-                }
-            } else {
-                throw new Error('No response from AI');
             }
+            
+            const regenerateBtn = document.getElementById('regenerateVisualizationBtn');
+            if (regenerateBtn) {
+                regenerateBtn.style.display = 'inline-flex';
+            }
+            
         } catch (error) {
             console.error('Visualization error:', error);
             resultDiv.innerHTML = `
                 <div class="error-content">
                     <h3>❌ Visualization Failed</h3>
-                    <p>Sorry, couldn't generate the outfit visualization. Please try again.</p>
+                    <p>Sorry, couldn't generate the outfit visualization. Error: ${error.message}</p>
+                    <p><small>Check console for more details.</small></p>
                 </div>
             `;
         } finally {
