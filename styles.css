@@ -46,7 +46,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
+    background:
         radial-gradient(circle at 20% 20%, rgba(255, 107, 157, 0.08) 0%, transparent 50%),
         radial-gradient(circle at 80% 80%, rgba(255, 179, 217, 0.06) 0%, transparent 50%),
         radial-gradient(circle at 50% 10%, rgba(255, 224, 237, 0.04) 0%, transparent 60%);
@@ -66,6 +66,7 @@ body::before {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -73,10 +74,13 @@ body::before {
 }
 
 @keyframes gentlePulse {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: scale(1);
         opacity: 1;
     }
+
     50% {
         transform: scale(1.02);
         opacity: 0.9;
@@ -87,6 +91,7 @@ body::before {
     0% {
         background-position: -200% 0;
     }
+
     100% {
         background-position: 200% 0;
     }
@@ -440,7 +445,8 @@ video {
     justify-content: center;
 }
 
-.capture-btn, .retry-btn {
+.capture-btn,
+.retry-btn {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -507,8 +513,13 @@ video {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .loading-state p {
@@ -707,7 +718,8 @@ video {
     box-shadow: 0 8px 32px rgba(255, 107, 157, 0.25);
 }
 
-.start-over-btn, .back-btn {
+.start-over-btn,
+.back-btn {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -722,7 +734,8 @@ video {
     font-family: inherit;
 }
 
-.start-over-btn:hover, .back-btn:hover {
+.start-over-btn:hover,
+.back-btn:hover {
     background: var(--accent-soft);
     color: var(--accent-pink);
     transform: translateY(-1px);
@@ -994,67 +1007,67 @@ footer p {
     .hero h2 {
         font-size: 36px;
     }
-    
+
     .section-header h2 {
         font-size: 28px;
     }
-    
+
     .feature-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .main-nav .container {
         flex-direction: column;
         gap: 8px;
     }
-    
+
     .nav-btn {
         width: 100%;
         justify-content: center;
     }
-    
+
     .camera-controls {
         flex-direction: column;
     }
-    
+
     .capture-controls {
         flex-direction: column;
     }
-    
+
     .modal-content {
         margin: 16px;
         width: calc(100% - 32px);
     }
-    
+
     .chat-actions {
         flex-direction: column;
     }
-    
+
     .visualization-actions {
         flex-direction: column;
     }
-    
+
     .chat-input-container {
         flex-direction: column;
     }
-    
+
     .chat-message.user {
         margin-left: 0;
     }
-    
+
     .chat-message.ai {
         margin-right: 0;
     }
-    
+
     .guide-frame.wide {
         width: 250px;
         height: 150px;
     }
-    
+
     .container {
         padding: 0 16px;
     }
-    
+
     .camera-container,
     .chat-container,
     .visualization-container,
@@ -1067,29 +1080,70 @@ footer p {
     .hero h2 {
         font-size: 28px;
     }
-    
+
     .section-header h2 {
         font-size: 24px;
     }
-    
+
     .feature-card {
-        padding: 24px;
+        padding: 20px;
     }
-    
+
     .cta-btn {
-        padding: 14px 24px;
-        font-size: 14px;
+        padding: 16px 24px;
+        font-size: 16px;
+        width: 100%;
     }
-    
+
     .hero p {
         font-size: 16px;
     }
-    
+
     .camera-container,
     .chat-container,
     .visualization-container,
     .result-container {
         padding: 16px;
+        margin: 8px;
+        border-radius: 12px;
+    }
+
+    /* Better mobile buttons */
+    .btn, .action-btn {
+        padding: 16px 20px;
+        font-size: 16px;
+        min-height: 48px;
+        touch-action: manipulation;
+    }
+
+    /* Larger touch targets */
+    .nav-btn {
+        padding: 16px 24px;
+        min-height: 48px;
+    }
+
+    /* Better mobile chat */
+    .chat-input {
+        font-size: 16px;
+        padding: 16px;
+        min-height: 48px;
+    }
+
+    /* Mobile-friendly video */
+    .camera-video {
+        width: 100%;
+        height: auto;
+        max-height: 60vh;
+    }
+
+    /* Better mobile spacing */
+    .section {
+        padding: 20px 0;
+    }
+
+    /* Prevent zoom on input focus */
+    input, textarea, select {
+        font-size: 16px;
     }
 }
 
@@ -1098,7 +1152,7 @@ footer p {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 
+    box-shadow:
         0 8px 32px rgba(0, 0, 0, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
@@ -1116,12 +1170,10 @@ footer p {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.4),
-        transparent
-    );
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.4),
+            transparent);
     transition: left 0.5s ease;
 }
 
@@ -1178,6 +1230,7 @@ footer p {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1198,18 +1251,14 @@ footer p {
 
 /* Enhanced loading spinner */
 .spinner {
-    background: conic-gradient(
-        from 0deg,
-        transparent 0deg 60deg,
-        var(--accent-pink) 60deg 120deg,
-        transparent 120deg 360deg
-    );
+    background: conic-gradient(from 0deg,
+            transparent 0deg 60deg,
+            var(--accent-pink) 60deg 120deg,
+            transparent 120deg 360deg);
     border-radius: 50%;
-    mask: radial-gradient(
-        circle at center,
-        transparent 20px,
-        black 22px
-    );
+    mask: radial-gradient(circle at center,
+            transparent 20px,
+            black 22px);
 }
 
 /* Micro-interactions */
@@ -1289,6 +1338,7 @@ footer p {
 
 /* Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -1313,7 +1363,7 @@ footer p {
     .no-print {
         display: none !important;
     }
-    
+
     * {
         background: white !important;
         color: black !important;

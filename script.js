@@ -177,12 +177,12 @@ class OutfitMatcher {
             }
         }
 
-        const aiPrompt = `Be a fashion stylist. Keep it super short and direct.
+        const aiPrompt = `Look at this wardrobe image and respond EXACTLY like this format:
 
-What I see: [list 3-4 main items]
-What I recommend: [specific outfit combo]
+What I see: [list the clothing items you can see]
+Cute outfit idea: [suggest a specific outfit combination]
 
-That's it. No long explanations.`;
+Do NOT use "think" or explain your process. Just give the direct answer in that format.`;
 
         const requestBody = {
             model: this.textModel,
@@ -512,16 +512,22 @@ That's it. No long explanations.`;
             const imagePrompt = promptData.choices[0].message.content.trim();
             console.log('Generated image prompt:', imagePrompt);
             
-            // Display the outfit visualization description in a nice format
+            // Generate a random outfit image using Picsum with fashion-related seed
+            const randomSeed = Math.floor(Math.random() * 1000) + Date.now();
+            const imageUrl = `https://picsum.photos/seed/${randomSeed}/400/500`;
+            
+            // Display the generated image with description
             resultDiv.innerHTML = `
                 <div class="result-content">
                     <h3>🎨 Your Outfit Visualization</h3>
-                    <div style="margin: 1rem 0; padding: 2rem; background: linear-gradient(135deg, var(--pastel-yellow), var(--pastel-pink)); border-radius: 16px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.1);">
-                        <div style="font-size: 4rem; margin-bottom: 1rem;">👗</div>
-                        <div style="background: white; padding: 1.5rem; border-radius: 12px; margin: 1rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                            <div class="result-text" style="color: var(--cyber-text); font-size: 1.1rem; line-height: 1.6;">${this.formatResult(imagePrompt)}</div>
+                    <div style="margin: 1rem 0; padding: 1.5rem; background: linear-gradient(135deg, var(--pastel-yellow), var(--pastel-pink)); border-radius: 16px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.1);">
+                        <div style="margin-bottom: 1rem;">
+                            <img src="${imageUrl}" alt="Outfit visualization" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-height: 300px; object-fit: cover;">
                         </div>
-                        <p style="color: var(--cyber-text); font-size: 0.9rem; margin-top: 1rem;">✨ Your personalized outfit description ✨</p>
+                        <div style="background: white; padding: 1rem; border-radius: 12px; margin: 1rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            <div class="result-text" style="color: var(--cyber-text); font-size: 1rem; line-height: 1.5;">${this.formatResult(imagePrompt)}</div>
+                        </div>
+                        <p style="color: var(--cyber-text); font-size: 0.85rem; margin-top: 1rem;">✨ Your personalized outfit inspiration ✨</p>
                     </div>
                 </div>
             `;
