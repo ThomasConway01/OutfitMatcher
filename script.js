@@ -4,8 +4,8 @@ console.log('Written By Thomas Conway');
 class OutfitMatcher {
     constructor() {
         this.apiKey = 'OPENROUTER_API_KEY_PLACEHOLDER';
-        this.textModel = 'meta-llama/llama-3.2-11b-vision-instruct:free'; // Non-thinking vision model
-        this.imageModel = 'meta-llama/llama-3.2-11b-vision-instruct:free'; // Use vision model for descriptions
+        this.textModel = 'google/gemini-flash-1.5:free'; // Free vision model without thinking
+        this.imageModel = 'google/gemini-flash-1.5:free'; // Use vision model for descriptions
         this.currentStream = null;
         this.clearOldApiKeys();
         this.init();
