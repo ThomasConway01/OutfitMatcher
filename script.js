@@ -127,10 +127,19 @@ class OutfitMatcher {
         loadingDiv.style.display = 'block';
         resultDiv.innerHTML = '';
 
-        const prompt = `Look at this wardrobe/clothing collection and provide:
-1. A brief overview of what clothing items you can see (just list the main types and colors)
-2. Suggest ONE complete outfit combination from these items that would look good together
-Keep it simple and concise.`;
+        // Check if API key is properly set
+        if (!this.apiKey || this.apiKey === 'GEMINI_API_KEY_PLACEHOLDER') {
+            resultDiv.innerHTML = `
+                <div class="error-content">
+                    <h3>❌ API Key Missing</h3>
+                    <p>API key not configured. Please check your GitHub secrets.</p>
+                </div>
+            `;
+            loadingDiv.style.display = 'none';
+            return;
+        }
+
+        const prompt = `Look at this image and tell me what clothing items you can see. Then suggest one outfit combination from these items. Keep it brief and simple.`;
 
         const requestBody = {
             contents: [{
@@ -143,10 +152,18 @@ Keep it simple and concise.`;
                         }
                     }
                 ]
-            }]
+            }],
+            generationConfig: {
+                temperature: 0.7,
+                topK: 40,
+                topP: 0.95,
+                maxOutputTokens: 512
+            }
         };
 
         try {
+            console.log('Making API request to Gemini...');
+            
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
                 method: 'POST',
                 headers: {
@@ -155,7 +172,20 @@ Keep it simple and concise.`;
                 body: JSON.stringify(requestBody)
             });
 
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('API Error Response:', errorText);
+                throw new Error(`API Error ${response.status}: ${errorText}`);
+            }
+
             const data = await response.json();
+            console.log('API Response:', data);
+            
+            if (data.error) {
+                throw new Error(`API Error: ${data.error.message || 'Unknown error'}`);
+            }
             
             if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
                 const text = data.candidates[0].content.parts[0].text;
@@ -171,15 +201,43 @@ Keep it simple and concise.`;
                 if (retryBtn) {
                     retryBtn.style.display = 'inline-flex';
                 }
+            } else if (data.candidates && data.candidates[0] && data.candidates[0].finishReason === 'SAFETY') {
+                resultDiv.innerHTML = `
+                    <div class="error-content">
+                        <h3>⚠️ Content Filtered</h3>
+                        <p>The image was filtered for safety reasons. Please try a different photo.</p>
+                    </div>
+                `;
             } else {
-                throw new Error('No response from AI');
+                console.error('Unexpected response structure:', data);
+                resultDiv.innerHTML = `
+                    <div class="error-content">
+                        <h3>❌ Unexpected Response</h3>
+                        <p>Received unexpected response from AI. Please try again.</p>
+                    </div>
+                `;
             }
         } catch (error) {
             console.error('Analysis error:', error);
+            
+            let errorMessage = 'Unknown error occurred';
+            if (error.message.includes('API Error 400')) {
+                errorMessage = 'Invalid request. Please try a different image.';
+            } else if (error.message.includes('API Error 403')) {
+                errorMessage = 'API key invalid or quota exceeded.';
+            } else if (error.message.includes('API Error 429')) {
+                errorMessage = 'Too many requests. Please wait a moment and try again.';
+            } else if (error.message.includes('Failed to fetch')) {
+                errorMessage = 'Network error. Please check your connection.';
+            } else {
+                errorMessage = error.message;
+            }
+            
             resultDiv.innerHTML = `
                 <div class="error-content">
                     <h3>❌ Analysis Failed</h3>
-                    <p>Sorry, couldn't analyze your wardrobe. Please try again.</p>
+                    <p>${errorMessage}</p>
+                    <p><small>Check console for more details.</small></p>
                 </div>
             `;
         } finally {
