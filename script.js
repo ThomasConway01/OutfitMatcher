@@ -13,10 +13,23 @@ class OutfitMatcher {
 
     // Clear old API keys from localStorage
     clearOldApiKeys() {
-        // Remove old Gemini and Groq keys
-        localStorage.removeItem('gemini_api_key');
-        localStorage.removeItem('groq_api_key');
-        console.log('Cleared old API keys from localStorage');
+        // Check if this is the first time running the new version
+        const appVersion = localStorage.getItem('app_version');
+        const currentVersion = '2.0.0-openrouter';
+        
+        if (appVersion !== currentVersion) {
+            console.log('New version detected, clearing all old data...');
+            // Clear ALL localStorage to ensure clean slate
+            localStorage.clear();
+            // Set the new version
+            localStorage.setItem('app_version', currentVersion);
+            console.log('Cleared all localStorage and set new version:', currentVersion);
+        } else {
+            // Just remove old keys as backup
+            localStorage.removeItem('gemini_api_key');
+            localStorage.removeItem('groq_api_key');
+            console.log('Cleared old API keys from localStorage');
+        }
     }
 
     init() {
