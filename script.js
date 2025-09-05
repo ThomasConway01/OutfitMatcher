@@ -4,7 +4,7 @@ console.log('Written By Thomas Conway');
 class OutfitMatcher {
     constructor() {
         this.apiKey = 'OPENROUTER_API_KEY_PLACEHOLDER';
-        this.textModel = 'moonshotai/kimi-vl-a3b-thinking:free';
+        this.textModel = 'meta-llama/llama-3.2-11b-vision-instruct:free'; // Non-thinking vision model
         this.imageModel = 'meta-llama/llama-3.2-11b-vision-instruct:free'; // Use vision model for descriptions
         this.currentStream = null;
         this.clearOldApiKeys();
@@ -177,12 +177,12 @@ class OutfitMatcher {
             }
         }
 
-        const aiPrompt = `Look at this wardrobe image and respond EXACTLY like this format:
+        const aiPrompt = `Look at this wardrobe image and respond in EXACTLY this format with NO extra text or thinking:
 
-What I see: [list the clothing items you can see]
-Cute outfit idea: [suggest a specific outfit combination]
+What I see: [list specific clothing items and colors you can identify]
+Cute outfit idea: [suggest one specific outfit using items from what you see]
 
-Do NOT use "think" or explain your process. Just give the direct answer in that format.`;
+IMPORTANT: Give direct answers only. Do not explain your reasoning or use phrases like "I think" or "Let me analyze". Just state what you see and suggest an outfit.`;
 
         const requestBody = {
             model: this.textModel,
@@ -473,59 +473,31 @@ Do NOT use "think" or explain your process. Just give the direct answer in that 
         `;
         
         try {
-            // First, create a detailed prompt using the text model
-            const promptCreationResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${this.apiKey}`,
-                    'Content-Type': 'application/json',
-                    'HTTP-Referer': window.location.origin,
-                    'X-Title': 'Outfit Matcher'
-                },
-                body: JSON.stringify({
-                    model: this.textModel,
-                    messages: [
-                        {
-                            role: "user",
-                            content: `Create a detailed, visual prompt for AI image generation based on this outfit analysis: "${this.currentOutfit}"
-
-                            Make it a concise but descriptive prompt for generating a fashion illustration or realistic outfit photo. Focus on:
-                            - Specific clothing items and their colors
-                            - Style and fit details
-                            - How pieces work together
-                            - Professional fashion photography style
-                            
-                            Keep it under 100 words and suitable for image generation.`
-                        }
-                    ],
-                    max_tokens: 200,
-                    temperature: 0.7
-                })
-            });
+            // Extract outfit description from the current outfit analysis
+            let outfitDescription = this.currentOutfit;
             
-            const promptData = await promptCreationResponse.json();
-            
-            if (!promptData.choices || !promptData.choices[0] || !promptData.choices[0].message) {
-                throw new Error('Failed to create image prompt');
+            // Try to extract just the "Cute outfit idea" part if it exists
+            const outfitMatch = outfitDescription.match(/Cute outfit idea:\s*(.+?)(?:\n|$)/i);
+            if (outfitMatch) {
+                outfitDescription = outfitMatch[1].trim();
             }
             
-            const imagePrompt = promptData.choices[0].message.content.trim();
-            console.log('Generated image prompt:', imagePrompt);
+            console.log('Using outfit description for image:', outfitDescription);
             
             // Generate actual outfit image using Pollinations AI (free image generation)
-            const outfitImagePrompt = encodeURIComponent(`fashion outfit: ${imagePrompt}, clean white background, professional fashion photography, high quality`);
+            const outfitImagePrompt = encodeURIComponent(`fashion outfit: ${outfitDescription}, clean white background, professional fashion photography, high quality, stylish clothing combination`);
             const imageUrl = `https://image.pollinations.ai/prompt/${outfitImagePrompt}?width=400&height=500&seed=${Math.floor(Math.random() * 1000)}`;
             
-            // Display the generated outfit image with description
+            // Display the generated outfit image
             resultDiv.innerHTML = `
                 <div class="result-content">
                     <h3>🎨 Your Outfit Visualization</h3>
                     <div style="margin: 1rem 0; padding: 1.5rem; background: linear-gradient(135deg, var(--pastel-yellow), var(--pastel-pink)); border-radius: 16px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.1);">
                         <div style="margin-bottom: 1rem;">
-                            <img src="${imageUrl}" alt="Generated outfit visualization" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-height: 300px; object-fit: cover;" onload="this.style.opacity=1" style="opacity: 0; transition: opacity 0.3s ease;">
+                            <img src="${imageUrl}" alt="Generated outfit visualization" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-height: 400px; object-fit: cover; opacity: 1;">
                         </div>
                         <div style="background: white; padding: 1rem; border-radius: 12px; margin: 1rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                            <div class="result-text" style="color: var(--cyber-text); font-size: 1rem; line-height: 1.5;">${this.formatResult(imagePrompt)}</div>
+                            <div class="result-text" style="color: var(--cyber-text); font-size: 1rem; line-height: 1.5;"><strong>Outfit:</strong> ${outfitDescription}</div>
                         </div>
                         <p style="color: var(--cyber-text); font-size: 0.85rem; margin-top: 1rem;">✨ AI-generated outfit based on your wardrobe ✨</p>
                     </div>
