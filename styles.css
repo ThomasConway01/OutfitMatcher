@@ -1109,7 +1109,8 @@ footer p {
     }
 
     /* Better mobile buttons */
-    .btn, .action-btn {
+    .btn,
+    .action-btn {
         padding: 16px 20px;
         font-size: 16px;
         min-height: 48px;
@@ -1142,7 +1143,9 @@ footer p {
     }
 
     /* Prevent zoom on input focus */
-    input, textarea, select {
+    input,
+    textarea,
+    select {
         font-size: 16px;
     }
 }

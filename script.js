@@ -512,22 +512,22 @@ Do NOT use "think" or explain your process. Just give the direct answer in that 
             const imagePrompt = promptData.choices[0].message.content.trim();
             console.log('Generated image prompt:', imagePrompt);
             
-            // Generate a random outfit image using Picsum with fashion-related seed
-            const randomSeed = Math.floor(Math.random() * 1000) + Date.now();
-            const imageUrl = `https://picsum.photos/seed/${randomSeed}/400/500`;
+            // Generate actual outfit image using Pollinations AI (free image generation)
+            const outfitImagePrompt = encodeURIComponent(`fashion outfit: ${imagePrompt}, clean white background, professional fashion photography, high quality`);
+            const imageUrl = `https://image.pollinations.ai/prompt/${outfitImagePrompt}?width=400&height=500&seed=${Math.floor(Math.random() * 1000)}`;
             
-            // Display the generated image with description
+            // Display the generated outfit image with description
             resultDiv.innerHTML = `
                 <div class="result-content">
                     <h3>🎨 Your Outfit Visualization</h3>
                     <div style="margin: 1rem 0; padding: 1.5rem; background: linear-gradient(135deg, var(--pastel-yellow), var(--pastel-pink)); border-radius: 16px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.1);">
                         <div style="margin-bottom: 1rem;">
-                            <img src="${imageUrl}" alt="Outfit visualization" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-height: 300px; object-fit: cover;">
+                            <img src="${imageUrl}" alt="Generated outfit visualization" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-height: 300px; object-fit: cover;" onload="this.style.opacity=1" style="opacity: 0; transition: opacity 0.3s ease;">
                         </div>
                         <div style="background: white; padding: 1rem; border-radius: 12px; margin: 1rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                             <div class="result-text" style="color: var(--cyber-text); font-size: 1rem; line-height: 1.5;">${this.formatResult(imagePrompt)}</div>
                         </div>
-                        <p style="color: var(--cyber-text); font-size: 0.85rem; margin-top: 1rem;">✨ Your personalized outfit inspiration ✨</p>
+                        <p style="color: var(--cyber-text); font-size: 0.85rem; margin-top: 1rem;">✨ AI-generated outfit based on your wardrobe ✨</p>
                     </div>
                 </div>
             `;
