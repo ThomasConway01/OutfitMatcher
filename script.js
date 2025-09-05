@@ -5,7 +5,7 @@ class OutfitMatcher {
     constructor() {
         this.apiKey = 'OPENROUTER_API_KEY_PLACEHOLDER';
         this.textModel = 'moonshotai/kimi-vl-a3b-thinking:free';
-        this.imageModel = 'openai/gpt-oss-120b:free';
+        this.imageModel = 'google/gemma-2-9b-it:free'; // Using a free text model for image prompts
         this.currentStream = null;
         this.clearOldApiKeys();
         this.init();
@@ -496,66 +496,22 @@ class OutfitMatcher {
             const imagePrompt = promptData.choices[0].message.content.trim();
             console.log('Generated image prompt:', imagePrompt);
             
-            // Now generate the actual image using FLUX
-            const imageResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${this.apiKey}`,
-                    'Content-Type': 'application/json',
-                    'HTTP-Referer': window.location.origin,
-                    'X-Title': 'Outfit Matcher'
-                },
-                body: JSON.stringify({
-                    model: this.imageModel,
-                    messages: [
-                        {
-                            role: "user",
-                            content: imagePrompt
-                        }
-                    ],
-                    max_tokens: 1,
-                    temperature: 0.7
-                })
-            });
-            
-            const imageData = await imageResponse.json();
-            console.log('Image generation response:', imageData);
-            
-            // Check if we got an image URL back
-            if (imageData.choices && imageData.choices[0] && imageData.choices[0].message && imageData.choices[0].message.content) {
-                const imageUrl = imageData.choices[0].message.content.trim();
-                
-                // Display the generated image
-                resultDiv.innerHTML = `
-                    <div class="result-content">
-                        <h3>🎨 Generated Outfit Visualization</h3>
-                        <div style="margin: 1rem 0;">
-                            <img src="${imageUrl}" alt="Generated outfit visualization" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,255,255,0.3);">
-                        </div>
-                        <div class="result-text">
-                            <p><strong>Prompt used:</strong> ${imagePrompt}</p>
-                        </div>
+            // Display the generated prompt (no actual image generation to avoid costs)
+            resultDiv.innerHTML = `
+                <div class="result-content">
+                    <h3>🎨 Outfit Visualization Description</h3>
+                    <div class="result-text">${this.formatResult(imagePrompt)}</div>
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                        <p><strong>💡 Pro Tip:</strong> Copy this description and use it with AI image generators:</p>
+                        <ul style="text-align: left; margin: 0.5rem 0;">
+                            <li><a href="https://www.midjourney.com" target="_blank" style="color: var(--cyber-primary);">Midjourney</a></li>
+                            <li><a href="https://openai.com/dall-e-2" target="_blank" style="color: var(--cyber-primary);">DALL-E</a></li>
+                            <li><a href="https://stability.ai/stable-diffusion" target="_blank" style="color: var(--cyber-primary);">Stable Diffusion</a></li>
+                            <li><a href="https://huggingface.co/spaces/black-forest-labs/FLUX.1-dev" target="_blank" style="color: var(--cyber-primary);">FLUX (Free)</a></li>
+                        </ul>
                     </div>
-                `;
-            } else {
-                // Fallback to showing the prompt if image generation fails
-                resultDiv.innerHTML = `
-                    <div class="result-content">
-                        <h3>🎨 Outfit Visualization Prompt</h3>
-                        <div class="result-text">${this.formatResult(imagePrompt)}</div>
-                        <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
-                            <p><strong>💡 Image generation is processing...</strong></p>
-                            <p>The FLUX model is generating your outfit visualization. This may take a moment.</p>
-                            <p>You can also copy this prompt and use it with other AI image generators:</p>
-                            <ul style="text-align: left; margin: 0.5rem 0;">
-                                <li><a href="https://www.midjourney.com" target="_blank" style="color: var(--cyber-primary);">Midjourney</a></li>
-                                <li><a href="https://openai.com/dall-e-2" target="_blank" style="color: var(--cyber-primary);">DALL-E</a></li>
-                                <li><a href="https://stability.ai/stable-diffusion" target="_blank" style="color: var(--cyber-primary);">Stable Diffusion</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                `;
-            }
+                </div>
+            `;
             
             const regenerateBtn = document.getElementById('regenerateVisualizationBtn');
             if (regenerateBtn) {
