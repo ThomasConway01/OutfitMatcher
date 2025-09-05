@@ -15,7 +15,6 @@
     <header>
         <div class="container">
             <h1 class="logo">👗 Outfit Matcher</h1>
-            <button id="settingsBtn" class="settings-btn" title="Settings">⚙️</button>
         </div>
     </header>
 
@@ -25,13 +24,9 @@
                 <span class="icon">🏠</span>
                 <span>Home</span>
             </button>
-            <button id="visualizeBtn" class="nav-btn">
-                <span class="icon">👕</span>
-                <span>Single Item</span>
-            </button>
             <button id="wardrobeBtn" class="nav-btn">
                 <span class="icon">👔</span>
-                <span>Full Wardrobe</span>
+                <span>Wardrobe Scanner</span>
             </button>
         </div>
     </nav>
@@ -39,75 +34,30 @@
     <main class="container">
         <div id="home" class="section active">
             <div class="hero">
-                <h2>AI-Powered Fashion Assistant</h2>
-                <p>Transform your style with intelligent outfit recommendations powered by Google's Gemini AI</p>
+                <h2>AI Wardrobe Assistant</h2>
+                <p>Take a photo of your wardrobe and get instant outfit suggestions powered by Google's Gemini AI</p>
+                <div class="cta-section">
+                    <button id="startScanBtn" class="cta-btn">
+                        <span class="icon">📸</span>
+                        <span>Start Wardrobe Scan</span>
+                    </button>
+                </div>
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <div class="feature-icon">📸</div>
-                        <h3>Smart Analysis</h3>
-                        <p>Take photos of clothing items and get instant AI analysis</p>
+                        <div class="feature-icon">📷</div>
+                        <h3>Quick Scan</h3>
+                        <p>Simply take a photo of your wardrobe or clothing collection</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3>AI Analysis</h3>
+                        <p>Get a brief overview of your clothing items and colors</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">✨</div>
-                        <h3>Style Suggestions</h3>
-                        <p>Receive personalized outfit combinations and styling tips</p>
+                        <h3>Outfit Suggestion</h3>
+                        <p>Receive one complete outfit recommendation you can wear today</p>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">👗</div>
-                        <h3>Wardrobe Scanner</h3>
-                        <p>Analyze your entire wardrobe for maximum outfit potential</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="visualize" class="section">
-            <div class="section-header">
-                <h2>Single Item Analysis</h2>
-                <p>Capture a clothing item to get styling suggestions</p>
-            </div>
-            
-            <div class="camera-container">
-                <div class="camera-controls">
-                    <select id="cameraSelect" class="camera-select">
-                        <option value="">Select Camera...</option>
-                    </select>
-                    <button id="switchCamera" class="icon-btn" title="Switch Camera">🔄</button>
-                </div>
-                
-                <div class="video-container">
-                    <video id="video" autoplay playsinline></video>
-                    <div class="video-overlay">
-                        <div class="capture-guide">
-                            <div class="guide-frame"></div>
-                            <p>Position clothing item in frame</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="capture-controls">
-                    <button id="capture" class="capture-btn">
-                        <span class="icon">📷</span>
-                        <span>Capture & Analyze</span>
-                    </button>
-                    <button id="retry" class="retry-btn" style="display:none;">
-                        <span class="icon">🔄</span>
-                        <span>Try Different Style</span>
-                    </button>
-                </div>
-            </div>
-
-            <canvas id="canvas" style="display:none;"></canvas>
-            
-            <div id="loading" class="loading-state" style="display:none;">
-                <div class="spinner"></div>
-                <p>Analyzing your style... This may take a moment</p>
-            </div>
-            
-            <div id="result" class="result-container">
-                <div class="result-placeholder">
-                    <div class="placeholder-icon">🎨</div>
-                    <p>Your outfit suggestions will appear here</p>
                 </div>
             </div>
         </div>
@@ -161,28 +111,7 @@
             </div>
         </div>
 
-        <!-- Settings Modal -->
-        <div id="settingsModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Settings</h2>
-                    <button id="closeSettings" class="close-btn">×</button>
-                </div>
-                <div class="settings-content">
-                    <div class="setting-group">
-                        <label for="newApiKey">API Key</label>
-                        <div class="input-group">
-                            <input type="password" id="newApiKey" placeholder="Enter new API key">
-                            <button id="updateApiKey">Update</button>
-                        </div>
-                    </div>
-                    <div class="setting-group">
-                        <button id="clearHistory" class="danger-btn">Clear All Data</button>
-                        <p class="help-text">This will remove your API key and any cached data</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+
     </main>
 
     <footer>
