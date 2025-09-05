@@ -150,12 +150,12 @@ class OutfitMatcher {
             }
         }
 
-        const prompt = `Look at this image and tell me what clothing items you can see. Then suggest one outfit combination from these items. Keep it brief and simple.`;
+        const aiPrompt = `Look at this image and tell me what clothing items you can see. Then suggest one outfit combination from these items. Keep it brief and simple.`;
 
         const requestBody = {
             contents: [{
                 parts: [
-                    { text: prompt },
+                    { text: aiPrompt },
                     {
                         inline_data: {
                             mime_type: "image/jpeg",
