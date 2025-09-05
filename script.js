@@ -7,7 +7,16 @@ class OutfitMatcher {
         this.textModel = 'anthropic/claude-3.5-sonnet';
         this.imageModel = 'black-forest-labs/flux-schnell';
         this.currentStream = null;
+        this.clearOldApiKeys();
         this.init();
+    }
+
+    // Clear old API keys from localStorage
+    clearOldApiKeys() {
+        // Remove old Gemini and Groq keys
+        localStorage.removeItem('gemini_api_key');
+        localStorage.removeItem('groq_api_key');
+        console.log('Cleared old API keys from localStorage');
     }
 
     init() {
