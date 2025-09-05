@@ -58,6 +58,12 @@ body::before {
     padding: 0 20px;
 }
 
+/* Loading animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* Header */
 header {
     background: rgba(26, 26, 46, 0.9);

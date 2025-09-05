@@ -461,6 +461,19 @@ That's it. No long explanations.`;
         // Scroll to visualization
         visualizationContainer.scrollIntoView({ behavior: 'smooth' });
         
+        // Show clean loading state
+        resultDiv.innerHTML = `
+            <div class="result-content">
+                <h3>🎨 Generating Your Outfit...</h3>
+                <div style="display: flex; justify-content: center; align-items: center; min-height: 300px; background: #f5f5f5; border-radius: 12px; margin: 1rem 0;">
+                    <div style="text-align: center;">
+                        <div style="width: 50px; height: 50px; border: 4px solid var(--cyber-border); border-top: 4px solid var(--cyber-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+                        <p style="color: var(--cyber-text-dim); font-size: 0.9rem;">Creating your outfit visualization...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        
         try {
             // First, create a detailed prompt using the text model
             const promptCreationResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -484,7 +497,7 @@ That's it. No long explanations.`;
                             - How pieces work together
                             - Professional fashion photography style
                             
-                            Keep it under 100 words and suitable for FLUX image generation.`
+                            Keep it under 100 words and suitable for image generation.`
                         }
                     ],
                     max_tokens: 200,
