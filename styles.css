@@ -1,23 +1,26 @@
-/* Cute Pastel Cyberpunk Theme Variables */
+/* Clueless Inspired Cute Theme */
 :root {
-    --cyber-bg: #fef7ff;
-    --cyber-bg-secondary: #fff0f8;
-    --cyber-bg-tertiary: #ffe8f5;
-    --cyber-primary: #ff69b4;
-    --cyber-secondary: #dda0dd;
-    --cyber-accent: #ffb6c1;
-    --cyber-danger: #ff91a4;
-    --cyber-success: #98fb98;
-    --cyber-text: #4a4a4a;
-    --cyber-text-dim: #8a8a8a;
-    --cyber-border: #f0c0d0;
-    --cyber-glow: 0 0 15px;
-    --cyber-glow-strong: 0 0 25px;
-    --pastel-yellow: #fff8dc;
-    --pastel-blue: #e6f3ff;
+    --cyber-bg: #fffef7;
+    --cyber-bg-secondary: #fff9e6;
+    --cyber-bg-tertiary: #f5f0e8;
+    --cyber-primary: #d4af37;
+    --cyber-secondary: #8b4513;
+    --cyber-accent: #ffb347;
+    --cyber-danger: #cd5c5c;
+    --cyber-success: #90ee90;
+    --cyber-text: #2f2f2f;
+    --cyber-text-dim: #6b6b6b;
+    --cyber-border: #e6d7c3;
+    --cyber-glow: 0 0 10px;
+    --cyber-glow-strong: 0 0 20px;
+    --pastel-yellow: #fffacd;
+    --pastel-pink: #ffc0cb;
+    --pastel-blue: #e0f6ff;
     --pastel-green: #f0fff0;
-    --coral: #ffb3ba;
-    --lilac: #e6e6fa;
+    --coral: #ff7f7f;
+    --lilac: #dda0dd;
+    --cream: #fffdd0;
+    --warm-brown: #a0522d;
 }
 
 * {
@@ -42,9 +45,9 @@ body::before {
     width: 100%;
     height: 100%;
     background: 
-        radial-gradient(circle at 20% 80%, var(--pastel-blue) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, var(--lilac) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, var(--pastel-yellow) 0%, transparent 70%);
+        radial-gradient(circle at 20% 80%, var(--pastel-yellow) 0%, transparent 60%),
+        radial-gradient(circle at 80% 20%, var(--pastel-pink) 0%, transparent 60%),
+        radial-gradient(circle at 50% 50%, var(--cream) 0%, transparent 80%);
     pointer-events: none;
     z-index: -1;
 }
