@@ -199,4 +199,8 @@ This project is open source and available under the [MIT License](LICENSE).
 
 **Made with ❤️ and lots of ☕ | Powered by Google Gemini AI**
 
+<<<<<<< HEAD
 *Transform your style with AI-powered fashion recommendations!* ✨👔👗
+=======
+*Transform your style with AI-powered fashion recommendations!* ✨👔👗
+>>>>>>> 7916cc041453acbf80754664e3ee67f029f1c7f2

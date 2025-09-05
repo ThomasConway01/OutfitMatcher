@@ -109,6 +109,66 @@
                     <p>Your wardrobe analysis will appear here</p>
                 </div>
             </div>
+
+            <!-- Interactive Chat Section -->
+            <div id="outfitChat" class="chat-container" style="display:none;">
+                <div class="chat-header">
+                    <h3>💬 Ask About Your Outfit</h3>
+                    <p>Ask questions about the outfit suggestion to refine it</p>
+                </div>
+                
+                <div id="chatMessages" class="chat-messages"></div>
+                
+                <div class="chat-input-container">
+                    <input type="text" id="chatInput" placeholder="Ask about the outfit... (e.g., 'What pants should I wear?')" maxlength="200">
+                    <button id="sendChatBtn" class="chat-send-btn">
+                        <span class="icon">💬</span>
+                        <span>Ask</span>
+                    </button>
+                </div>
+                
+                <div class="chat-actions">
+                    <button id="visualizeOutfitBtn" class="visualize-btn">
+                        <span class="icon">🎨</span>
+                        <span>Visualize This Outfit</span>
+                    </button>
+                    <button id="startOverBtn" class="start-over-btn">
+                        <span class="icon">🔄</span>
+                        <span>Start Over</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Outfit Visualization Section -->
+            <div id="outfitVisualization" class="visualization-container" style="display:none;">
+                <div class="visualization-header">
+                    <h3>🎨 Outfit Visualization</h3>
+                    <p>AI-generated image of your outfit</p>
+                </div>
+                
+                <div id="visualizationLoading" class="loading-state" style="display:none;">
+                    <div class="spinner"></div>
+                    <p>Creating your outfit visualization... This may take a moment</p>
+                </div>
+                
+                <div id="visualizationResult" class="visualization-result">
+                    <div class="result-placeholder">
+                        <div class="placeholder-icon">🖼️</div>
+                        <p>Your outfit visualization will appear here</p>
+                    </div>
+                </div>
+                
+                <div class="visualization-actions">
+                    <button id="regenerateVisualizationBtn" class="retry-btn" style="display:none;">
+                        <span class="icon">🎨</span>
+                        <span>Generate Different Style</span>
+                    </button>
+                    <button id="backToChatBtn" class="back-btn">
+                        <span class="icon">💬</span>
+                        <span>Back to Chat</span>
+                    </button>
+                </div>
+            </div>
         </div>
 
 

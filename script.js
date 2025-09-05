@@ -213,10 +213,18 @@ class OutfitMatcher {
                     </div>
                 `;
                 
+                // Store the current outfit for chat context
+                this.currentOutfit = text;
+                this.currentImage = base64Image;
+                
+                // Show retry button and chat interface
                 const retryBtn = document.getElementById('retryWardrobe');
                 if (retryBtn) {
                     retryBtn.style.display = 'inline-flex';
                 }
+                
+                // Show chat interface
+                this.showChatInterface();
             } else if (data.candidates && data.candidates[0] && data.candidates[0].finishReason === 'SAFETY') {
                 resultDiv.innerHTML = `
                     <div class="error-content">
@@ -303,6 +311,215 @@ class OutfitMatcher {
         }
     }
 
+    // Show chat interface after outfit analysis
+    showChatInterface() {
+        const chatContainer = document.getElementById('outfitChat');
+        if (chatContainer) {
+            chatContainer.style.display = 'block';
+            
+            // Clear previous chat messages
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = `
+                <div class="chat-message ai">
+                    <div class="message-header">🤖 AI Fashion Assistant</div>
+                    <div class="message-content">I've analyzed your wardrobe! Feel free to ask me questions about the outfit suggestion, like "What shoes would work?" or "Can I wear this to work?"</div>
+                </div>
+            `;
+            
+            // Scroll to chat
+            chatContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    // Handle chat messages
+    async sendChatMessage() {
+        const chatInput = document.getElementById('chatInput');
+        const chatMessages = document.getElementById('chatMessages');
+        const sendBtn = document.getElementById('sendChatBtn');
+        
+        if (!chatInput.value.trim()) return;
+        
+        const userMessage = chatInput.value.trim();
+        chatInput.value = '';
+        
+        // Add user message to chat
+        const userMessageDiv = document.createElement('div');
+        userMessageDiv.className = 'chat-message user';
+        userMessageDiv.innerHTML = `
+            <div class="message-header">👤 You</div>
+            <div class="message-content">${userMessage}</div>
+        `;
+        chatMessages.appendChild(userMessageDiv);
+        
+        // Disable send button
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<span class="icon">⏳</span><span>Thinking...</span>';
+        
+        try {
+            // Create context-aware prompt
+            const contextPrompt = `Based on this wardrobe analysis and outfit suggestion: "${this.currentOutfit}"
+            
+            The user is asking: "${userMessage}"
+            
+            Please provide a helpful, specific answer about the outfit. Keep it conversational and brief. Focus on practical fashion advice.`;
+            
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: contextPrompt }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.8,
+                        topK: 40,
+                        topP: 0.95,
+                        maxOutputTokens: 256
+                    }
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+                const aiResponse = data.candidates[0].content.parts[0].text;
+                
+                // Add AI response to chat
+                const aiMessageDiv = document.createElement('div');
+                aiMessageDiv.className = 'chat-message ai';
+                aiMessageDiv.innerHTML = `
+                    <div class="message-header">🤖 AI Fashion Assistant</div>
+                    <div class="message-content">${this.formatResult(aiResponse)}</div>
+                `;
+                chatMessages.appendChild(aiMessageDiv);
+            } else {
+                throw new Error('No response from AI');
+            }
+        } catch (error) {
+            console.error('Chat error:', error);
+            const errorMessageDiv = document.createElement('div');
+            errorMessageDiv.className = 'chat-message ai';
+            errorMessageDiv.innerHTML = `
+                <div class="message-header">🤖 AI Fashion Assistant</div>
+                <div class="message-content">Sorry, I couldn't process that question. Please try asking something else about your outfit!</div>
+            `;
+            chatMessages.appendChild(errorMessageDiv);
+        } finally {
+            // Re-enable send button
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<span class="icon">💬</span><span>Ask</span>';
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
+
+    // Generate outfit visualization
+    async generateOutfitVisualization() {
+        const visualizationContainer = document.getElementById('outfitVisualization');
+        const loadingDiv = document.getElementById('visualizationLoading');
+        const resultDiv = document.getElementById('visualizationResult');
+        
+        // Show visualization section
+        visualizationContainer.style.display = 'block';
+        loadingDiv.style.display = 'block';
+        resultDiv.innerHTML = '';
+        
+        // Scroll to visualization
+        visualizationContainer.scrollIntoView({ behavior: 'smooth' });
+        
+        try {
+            // Create a detailed prompt for image generation
+            const visualPrompt = `Create a detailed description for an AI image generator of this outfit: "${this.currentOutfit}"
+            
+            Describe it as a fashion illustration or realistic outfit photo showing the complete look. Include colors, styles, and how the pieces work together. Make it suitable for an AI image generator prompt.`;
+            
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: visualPrompt }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.7,
+                        topK: 40,
+                        topP: 0.95,
+                        maxOutputTokens: 512
+                    }
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+                const imageDescription = data.candidates[0].content.parts[0].text;
+                
+                // For now, show the description since we can't generate actual images with Gemini
+                resultDiv.innerHTML = `
+                    <div class="result-content">
+                        <h3>🎨 Outfit Visualization Description</h3>
+                        <div class="result-text">${this.formatResult(imageDescription)}</div>
+                        <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                            <p><strong>💡 Pro Tip:</strong> Copy this description and use it with AI image generators like:</p>
+                            <ul style="text-align: left; margin: 0.5rem 0;">
+                                <li><a href="https://www.midjourney.com" target="_blank" style="color: var(--cyber-primary);">Midjourney</a></li>
+                                <li><a href="https://openai.com/dall-e-2" target="_blank" style="color: var(--cyber-primary);">DALL-E</a></li>
+                                <li><a href="https://stability.ai/stable-diffusion" target="_blank" style="color: var(--cyber-primary);">Stable Diffusion</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                
+                const regenerateBtn = document.getElementById('regenerateVisualizationBtn');
+                if (regenerateBtn) {
+                    regenerateBtn.style.display = 'inline-flex';
+                }
+            } else {
+                throw new Error('No response from AI');
+            }
+        } catch (error) {
+            console.error('Visualization error:', error);
+            resultDiv.innerHTML = `
+                <div class="error-content">
+                    <h3>❌ Visualization Failed</h3>
+                    <p>Sorry, couldn't generate the outfit visualization. Please try again.</p>
+                </div>
+            `;
+        } finally {
+            loadingDiv.style.display = 'none';
+        }
+    }
+
+    // Start over - reset everything
+    startOver() {
+        // Hide chat and visualization
+        document.getElementById('outfitChat').style.display = 'none';
+        document.getElementById('outfitVisualization').style.display = 'none';
+        
+        // Clear results
+        document.getElementById('wardrobeResult').innerHTML = `
+            <div class="result-placeholder">
+                <div class="placeholder-icon">👔</div>
+                <p>Your wardrobe analysis will appear here</p>
+            </div>
+        `;
+        
+        // Hide retry button
+        document.getElementById('retryWardrobe').style.display = 'none';
+        
+        // Clear stored data
+        this.currentOutfit = null;
+        this.currentImage = null;
+        
+        // Scroll back to camera
+        document.getElementById('wardrobeVideo').scrollIntoView({ behavior: 'smooth' });
+    }
+
     // Event Listeners
     setupEventListeners() {
         // Navigation
@@ -376,6 +593,54 @@ class OutfitMatcher {
                 } finally {
                     retryWardrobeBtn.disabled = false;
                 }
+            });
+        }
+
+        // Chat functionality
+        const sendChatBtn = document.getElementById('sendChatBtn');
+        if (sendChatBtn) {
+            sendChatBtn.addEventListener('click', () => {
+                this.sendChatMessage();
+            });
+        }
+
+        const chatInput = document.getElementById('chatInput');
+        if (chatInput) {
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.sendChatMessage();
+                }
+            });
+        }
+
+        // Visualization functionality
+        const visualizeOutfitBtn = document.getElementById('visualizeOutfitBtn');
+        if (visualizeOutfitBtn) {
+            visualizeOutfitBtn.addEventListener('click', () => {
+                this.generateOutfitVisualization();
+            });
+        }
+
+        const regenerateVisualizationBtn = document.getElementById('regenerateVisualizationBtn');
+        if (regenerateVisualizationBtn) {
+            regenerateVisualizationBtn.addEventListener('click', () => {
+                this.generateOutfitVisualization();
+            });
+        }
+
+        // Navigation buttons
+        const startOverBtn = document.getElementById('startOverBtn');
+        if (startOverBtn) {
+            startOverBtn.addEventListener('click', () => {
+                this.startOver();
+            });
+        }
+
+        const backToChatBtn = document.getElementById('backToChatBtn');
+        if (backToChatBtn) {
+            backToChatBtn.addEventListener('click', () => {
+                document.getElementById('outfitVisualization').style.display = 'none';
+                document.getElementById('outfitChat').scrollIntoView({ behavior: 'smooth' });
             });
         }
     }
