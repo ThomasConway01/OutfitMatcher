@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
 
 
@@ -67,7 +69,7 @@
                 <h2>Wardrobe Scanner</h2>
                 <p>Analyze your entire wardrobe for outfit combinations</p>
             </div>
-            
+
             <div class="camera-container">
                 <div class="camera-controls">
                     <select id="wardrobeCameraSelect" class="camera-select">
@@ -75,7 +77,7 @@
                     </select>
                     <button id="switchWardrobeCamera" class="icon-btn" title="Switch Camera">🔄</button>
                 </div>
-                
+
                 <div class="video-container">
                     <video id="wardrobeVideo" autoplay playsinline></video>
                     <div class="video-overlay">
@@ -85,7 +87,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="capture-controls">
                     <button id="scanWardrobe" class="capture-btn">
                         <span class="icon">🔍</span>
@@ -97,12 +99,12 @@
                     </button>
                 </div>
             </div>
-            
+
             <div id="wardrobeLoading" class="loading-state" style="display:none;">
                 <div class="spinner"></div>
                 <p>Scanning your wardrobe... Finding the best combinations</p>
             </div>
-            
+
             <div id="wardrobeResult" class="result-container">
                 <div class="result-placeholder">
                     <div class="placeholder-icon">👔</div>
@@ -116,17 +118,18 @@
                     <h3>💬 Ask About Your Outfit</h3>
                     <p>Ask questions about the outfit suggestion to refine it</p>
                 </div>
-                
+
                 <div id="chatMessages" class="chat-messages"></div>
-                
+
                 <div class="chat-input-container">
-                    <input type="text" id="chatInput" placeholder="Ask about the outfit... (e.g., 'What pants should I wear?')" maxlength="200">
+                    <input type="text" id="chatInput"
+                        placeholder="Ask about the outfit... (e.g., 'What pants should I wear?')" maxlength="200">
                     <button id="sendChatBtn" class="chat-send-btn">
                         <span class="icon">💬</span>
                         <span>Ask</span>
                     </button>
                 </div>
-                
+
                 <div class="chat-actions">
                     <button id="visualizeOutfitBtn" class="visualize-btn">
                         <span class="icon">🎨</span>
@@ -145,19 +148,19 @@
                     <h3>🎨 Outfit Visualization</h3>
                     <p>AI-generated image of your outfit</p>
                 </div>
-                
+
                 <div id="visualizationLoading" class="loading-state" style="display:none;">
                     <div class="spinner"></div>
                     <p>Creating your outfit visualization... This may take a moment</p>
                 </div>
-                
+
                 <div id="visualizationResult" class="visualization-result">
                     <div class="result-placeholder">
                         <div class="placeholder-icon">🖼️</div>
                         <p>Your outfit visualization will appear here</p>
                     </div>
                 </div>
-                
+
                 <div class="visualization-actions">
                     <button id="regenerateVisualizationBtn" class="retry-btn" style="display:none;">
                         <span class="icon">🎨</span>
@@ -182,4 +185,5 @@
 
     <script src="script.js?v=2"></script>
 </body>
+
 </html>

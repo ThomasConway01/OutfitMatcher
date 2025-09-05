@@ -5,7 +5,7 @@ class OutfitMatcher {
     constructor() {
         this.apiKey = 'OPENROUTER_API_KEY_PLACEHOLDER';
         this.textModel = 'moonshotai/kimi-vl-a3b-thinking:free';
-        this.imageModel = 'stabilityai/stable-diffusion-xl-base-1.0'; // Working image generation model
+        this.imageModel = 'meta-llama/llama-3.2-11b-vision-instruct:free'; // Use vision model for descriptions
         this.currentStream = null;
         this.clearOldApiKeys();
         this.init();
@@ -68,9 +68,7 @@ class OutfitMatcher {
 
         // Start camera if going to wardrobe section
         if (sectionId === 'wardrobe') {
-            setTimeout(() => {
-                this.initCamera();
-            }, 200);
+            this.initCamera();
         }
     }
 
@@ -514,60 +512,19 @@ That's it. No long explanations.`;
             const imagePrompt = promptData.choices[0].message.content.trim();
             console.log('Generated image prompt:', imagePrompt);
             
-            // Now generate the actual image using FLUX
-            const imageResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${this.apiKey}`,
-                    'Content-Type': 'application/json',
-                    'HTTP-Referer': window.location.origin,
-                    'X-Title': 'Outfit Matcher'
-                },
-                body: JSON.stringify({
-                    model: this.imageModel,
-                    messages: [
-                        {
-                            role: "user",
-                            content: imagePrompt
-                        }
-                    ],
-                    max_tokens: 1,
-                    temperature: 0.7
-                })
-            });
-            
-            const imageData = await imageResponse.json();
-            console.log('Image generation response:', imageData);
-            
-            // Check if we got an image URL back
-            if (imageData.choices && imageData.choices[0] && imageData.choices[0].message && imageData.choices[0].message.content) {
-                const imageUrl = imageData.choices[0].message.content.trim();
-                
-                // Display the generated image
-                resultDiv.innerHTML = `
-                    <div class="result-content">
-                        <h3>🎨 Your Outfit Visualization</h3>
-                        <div style="margin: 1rem 0;">
-                            <img src="${imageUrl}" alt="Generated outfit visualization" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,255,255,0.3);">
+            // Display the outfit visualization description in a nice format
+            resultDiv.innerHTML = `
+                <div class="result-content">
+                    <h3>🎨 Your Outfit Visualization</h3>
+                    <div style="margin: 1rem 0; padding: 2rem; background: linear-gradient(135deg, var(--pastel-yellow), var(--pastel-pink)); border-radius: 16px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.1);">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">👗</div>
+                        <div style="background: white; padding: 1.5rem; border-radius: 12px; margin: 1rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            <div class="result-text" style="color: var(--cyber-text); font-size: 1.1rem; line-height: 1.6;">${this.formatResult(imagePrompt)}</div>
                         </div>
-                        <div class="result-text">
-                            <p><strong>Generated from:</strong> ${imagePrompt}</p>
-                        </div>
+                        <p style="color: var(--cyber-text); font-size: 0.9rem; margin-top: 1rem;">✨ Your personalized outfit description ✨</p>
                     </div>
-                `;
-            } else {
-                // Fallback if image generation fails
-                resultDiv.innerHTML = `
-                    <div class="result-content">
-                        <h3>🎨 Outfit Visualization</h3>
-                        <div class="result-text">${this.formatResult(imagePrompt)}</div>
-                        <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
-                            <p><strong>⚠️ Image generation in progress...</strong></p>
-                            <p>FLUX is creating your outfit image. This may take a moment to process.</p>
-                        </div>
-                    </div>
-                `;
-            }
+                </div>
+            `;
             
             const regenerateBtn = document.getElementById('regenerateVisualizationBtn');
             if (regenerateBtn) {
