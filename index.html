@@ -3,45 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Outfit Matcher</title>
+    <title>Outfit Matcher - AI Fashion Assistant</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <nav>
-        <button id="homeBtn">Home</button>
-        <button id="visualizeBtn">Visualize Outfit</button>
-        <button id="wardrobeBtn">Wardrobe Scanner</button>
+    <!-- API Key Setup Modal -->
+    <div id="apiKeyModal" class="modal">
+        <div class="modal-content">
+            <h2>🔑 Setup Required</h2>
+            <p>To use Outfit Matcher, you need a Google Gemini API key.</p>
+            <div class="input-group">
+                <input type="password" id="apiKeyInput" placeholder="Enter your Gemini API key">
+                <button id="saveApiKey">Save Key</button>
+            </div>
+            <div class="help-text">
+                <p><strong>How to get your API key:</strong></p>
+                <ol>
+                    <li>Visit <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></li>
+                    <li>Sign in with your Google account</li>
+                    <li>Click "Create API Key"</li>
+                    <li>Copy and paste it above</li>
+                </ol>
+                <p><small>Your API key is stored locally and never shared.</small></p>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="container">
+            <h1 class="logo">👗 Outfit Matcher</h1>
+            <button id="settingsBtn" class="settings-btn" title="Settings">⚙️</button>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <div class="container">
+            <button id="homeBtn" class="nav-btn active">
+                <span class="icon">🏠</span>
+                <span>Home</span>
+            </button>
+            <button id="visualizeBtn" class="nav-btn">
+                <span class="icon">👕</span>
+                <span>Single Item</span>
+            </button>
+            <button id="wardrobeBtn" class="nav-btn">
+                <span class="icon">👔</span>
+                <span>Full Wardrobe</span>
+            </button>
+        </div>
     </nav>
 
-    <div id="home" class="section">
-        <h1>Welcome to Outfit Matcher</h1>
-        <p>Use AI to analyze your clothing and get outfit suggestions!</p>
-        <p>Click the buttons above to get started.</p>
-    </div>
+    <main class="container">
+        <div id="home" class="section active">
+            <div class="hero">
+                <h2>AI-Powered Fashion Assistant</h2>
+                <p>Transform your style with intelligent outfit recommendations powered by Google's Gemini AI</p>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📸</div>
+                        <h3>Smart Analysis</h3>
+                        <p>Take photos of clothing items and get instant AI analysis</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">✨</div>
+                        <h3>Style Suggestions</h3>
+                        <p>Receive personalized outfit combinations and styling tips</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">👗</div>
+                        <h3>Wardrobe Scanner</h3>
+                        <p>Analyze your entire wardrobe for maximum outfit potential</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <div id="visualize" class="section" style="display:none;">
-        <h2>Visualize Outfit</h2>
-        <p>Take a photo of a clothing item to get outfit suggestions.</p>
-        <select id="cameraSelect"></select>
-        <video id="video" autoplay></video>
-        <button id="capture">Capture</button>
-        <button id="retry" style="display:none;">Try Different Outfit</button>
-        <canvas id="canvas" style="display:none;"></canvas>
-        <div id="loading" style="display:none;">Analyzing... <span class="spinner"></span></div>
-        <div id="result">Results will appear here after capture.</div>
-    </div>
+        <div id="visualize" class="section">
+            <div class="section-header">
+                <h2>Single Item Analysis</h2>
+                <p>Capture a clothing item to get styling suggestions</p>
+            </div>
+            
+            <div class="camera-container">
+                <div class="camera-controls">
+                    <select id="cameraSelect" class="camera-select">
+                        <option value="">Select Camera...</option>
+                    </select>
+                    <button id="switchCamera" class="icon-btn" title="Switch Camera">🔄</button>
+                </div>
+                
+                <div class="video-container">
+                    <video id="video" autoplay playsinline></video>
+                    <div class="video-overlay">
+                        <div class="capture-guide">
+                            <div class="guide-frame"></div>
+                            <p>Position clothing item in frame</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="capture-controls">
+                    <button id="capture" class="capture-btn">
+                        <span class="icon">📷</span>
+                        <span>Capture & Analyze</span>
+                    </button>
+                    <button id="retry" class="retry-btn" style="display:none;">
+                        <span class="icon">🔄</span>
+                        <span>Try Different Style</span>
+                    </button>
+                </div>
+            </div>
 
-    <div id="wardrobe" class="section" style="display:none;">
-        <h2>Wardrobe Scanner</h2>
-        <p>Take a photo of your wardrobe to get combination ideas.</p>
-        <select id="wardrobeCameraSelect"></select>
-        <video id="wardrobeVideo" autoplay></video>
-        <button id="scanWardrobe">Scan Wardrobe</button>
-        <button id="retryWardrobe" style="display:none;">Try Different Outfit</button>
-        <div id="wardrobeLoading" style="display:none;">Analyzing... <span class="spinner"></span></div>
-        <div id="wardrobeResult">Results will appear here after scan.</div>
-    </div>
+            <canvas id="canvas" style="display:none;"></canvas>
+            
+            <div id="loading" class="loading-state" style="display:none;">
+                <div class="spinner"></div>
+                <p>Analyzing your style... This may take a moment</p>
+            </div>
+            
+            <div id="result" class="result-container">
+                <div class="result-placeholder">
+                    <div class="placeholder-icon">🎨</div>
+                    <p>Your outfit suggestions will appear here</p>
+                </div>
+            </div>
+        </div>
 
-    <script src="script.js?v=1"></script>
+        <div id="wardrobe" class="section">
+            <div class="section-header">
+                <h2>Wardrobe Scanner</h2>
+                <p>Analyze your entire wardrobe for outfit combinations</p>
+            </div>
+            
+            <div class="camera-container">
+                <div class="camera-controls">
+                    <select id="wardrobeCameraSelect" class="camera-select">
+                        <option value="">Select Camera...</option>
+                    </select>
+                    <button id="switchWardrobeCamera" class="icon-btn" title="Switch Camera">🔄</button>
+                </div>
+                
+                <div class="video-container">
+                    <video id="wardrobeVideo" autoplay playsinline></video>
+                    <div class="video-overlay">
+                        <div class="capture-guide wardrobe-guide">
+                            <div class="guide-frame wide"></div>
+                            <p>Capture your wardrobe or clothing collection</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="capture-controls">
+                    <button id="scanWardrobe" class="capture-btn">
+                        <span class="icon">🔍</span>
+                        <span>Scan Wardrobe</span>
+                    </button>
+                    <button id="retryWardrobe" class="retry-btn" style="display:none;">
+                        <span class="icon">🔄</span>
+                        <span>Different Combination</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="wardrobeLoading" class="loading-state" style="display:none;">
+                <div class="spinner"></div>
+                <p>Scanning your wardrobe... Finding the best combinations</p>
+            </div>
+            
+            <div id="wardrobeResult" class="result-container">
+                <div class="result-placeholder">
+                    <div class="placeholder-icon">👔</div>
+                    <p>Your wardrobe analysis will appear here</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Settings</h2>
+                    <button id="closeSettings" class="close-btn">×</button>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <label for="newApiKey">API Key</label>
+                        <div class="input-group">
+                            <input type="password" id="newApiKey" placeholder="Enter new API key">
+                            <button id="updateApiKey">Update</button>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <button id="clearHistory" class="danger-btn">Clear All Data</button>
+                        <p class="help-text">This will remove your API key and any cached data</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Made with ❤️ by Thomas Conway | Powered by Google Gemini AI</p>
+        </div>
+    </footer>
+
+    <script src="script.js?v=2"></script>
 </body>
 </html>
