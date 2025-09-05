@@ -4,8 +4,8 @@ console.log('Written By Thomas Conway');
 class OutfitMatcher {
     constructor() {
         this.apiKey = 'OPENROUTER_API_KEY_PLACEHOLDER';
-        this.textModel = 'anthropic/claude-3.5-sonnet';
-        this.imageModel = 'black-forest-labs/flux-schnell';
+        this.textModel = 'moonshotai/kimi-vl-a3b-thinking:free';
+        this.imageModel = 'openai/gpt-oss-120b:free';
         this.currentStream = null;
         this.clearOldApiKeys();
         this.init();
