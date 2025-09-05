@@ -22,19 +22,23 @@
     <div id="visualize" class="section" style="display:none;">
         <h2>Visualize Outfit</h2>
         <p>Take a photo of a clothing item to get outfit suggestions.</p>
+        <select id="cameraSelect"></select>
         <video id="video" autoplay></video>
         <button id="capture">Capture</button>
         <button id="retry" style="display:none;">Try Different Outfit</button>
         <canvas id="canvas" style="display:none;"></canvas>
+        <div id="loading" style="display:none;">Analyzing... <span class="spinner"></span></div>
         <div id="result">Results will appear here after capture.</div>
     </div>
 
     <div id="wardrobe" class="section" style="display:none;">
         <h2>Wardrobe Scanner</h2>
         <p>Take a photo of your wardrobe to get combination ideas.</p>
+        <select id="wardrobeCameraSelect"></select>
         <video id="wardrobeVideo" autoplay></video>
         <button id="scanWardrobe">Scan Wardrobe</button>
         <button id="retryWardrobe" style="display:none;">Try Different Outfit</button>
+        <div id="wardrobeLoading" style="display:none;">Analyzing... <span class="spinner"></span></div>
         <div id="wardrobeResult">Results will appear here after scan.</div>
     </div>
 

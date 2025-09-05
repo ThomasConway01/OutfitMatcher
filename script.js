@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastImageData;
     let lastPrompt;
     let lastResultDiv;
+    let devices = [];
 
     function showSection(sectionId) {
         document.querySelectorAll('.section').forEach(section => section.style.display = 'none');
@@ -29,12 +30,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function startCamera(videoElement) {
+    async function populateCameraSelect(selectElement) {
+        try {
+            devices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = devices.filter(device => device.kind === 'videoinput');
+            selectElement.innerHTML = '';
+            videoDevices.forEach((device, index) => {
+                const option = document.createElement('option');
+                option.value = device.deviceId;
+                option.text = device.label || `Camera ${index + 1}`;
+                selectElement.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error enumerating devices:', error);
+        }
+    }
+
+    async function startCamera(videoElement, deviceId = null) {
         try {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 throw new Error('Camera not supported or not in secure context (HTTPS required on mobile)');
             }
-            currentStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            const constraints = {
+                video: deviceId ? { deviceId: { exact: deviceId } } : true
+            };
+            currentStream = await navigator.mediaDevices.getUserMedia(constraints);
             videoElement.srcObject = currentStream;
         } catch (error) {
             console.error('Error accessing camera:', error);
@@ -93,24 +113,39 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Home clicked');
         showSection('home');
     });
-    visualizeBtn.addEventListener('click', () => {
+    visualizeBtn.addEventListener('click', async () => {
         console.log('Visualize clicked');
         showSection('visualize');
+        await populateCameraSelect(document.getElementById('cameraSelect'));
         startCamera(video);
     });
-    wardrobeBtn.addEventListener('click', () => {
+    wardrobeBtn.addEventListener('click', async () => {
         console.log('Wardrobe clicked');
         showSection('wardrobe');
+        await populateCameraSelect(document.getElementById('wardrobeCameraSelect'));
         startCamera(wardrobeVideo);
     });
 
+    document.getElementById('cameraSelect').addEventListener('change', (e) => {
+        startCamera(video, e.target.value);
+    });
+    document.getElementById('wardrobeCameraSelect').addEventListener('change', (e) => {
+        startCamera(wardrobeVideo, e.target.value);
+    });
+
     captureButton.addEventListener('click', () => {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0);
-        const imageData = canvas.toDataURL('image/jpeg').split(',')[1];
-        analyzeImage(imageData, "Detect what clothes are in this image. Then recommend outfit combinations based on the detected clothes. Generate an image of what one outfit would look like when worn.", resultDiv);
+        captureButton.disabled = true;
+        document.getElementById('loading').style.display = 'block';
+        setTimeout(() => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            const imageData = canvas.toDataURL('image/jpeg').split(',')[1];
+            analyzeImage(imageData, "Detect what clothes are in this image. Then recommend outfit combinations based on the detected clothes. Generate an image of what one outfit would look like when worn.", resultDiv);
+            captureButton.disabled = false;
+            document.getElementById('loading').style.display = 'none';
+        }, 5000);
     });
 
     document.getElementById('retry').addEventListener('click', () => {
@@ -120,12 +155,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     scanWardrobeButton.addEventListener('click', () => {
-        canvas.width = wardrobeVideo.videoWidth;
-        canvas.height = wardrobeVideo.videoHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(wardrobeVideo, 0, 0);
-        const imageData = canvas.toDataURL('image/jpeg').split(',')[1];
-        analyzeImage(imageData, "Detect all clothes in this wardrobe image. Then recommend outfit combinations from the detected items. Generate an image of what one outfit would look like when worn.", wardrobeResultDiv);
+        scanWardrobeButton.disabled = true;
+        document.getElementById('wardrobeLoading').style.display = 'block';
+        setTimeout(() => {
+            canvas.width = wardrobeVideo.videoWidth;
+            canvas.height = wardrobeVideo.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(wardrobeVideo, 0, 0);
+            const imageData = canvas.toDataURL('image/jpeg').split(',')[1];
+            analyzeImage(imageData, "Detect all clothes in this wardrobe image. Then recommend outfit combinations from the detected items. Generate an image of what one outfit would look like when worn.", wardrobeResultDiv);
+            scanWardrobeButton.disabled = false;
+            document.getElementById('wardrobeLoading').style.display = 'none';
+        }, 5000);
     });
 
     document.getElementById('retryWardrobe').addEventListener('click', () => {
