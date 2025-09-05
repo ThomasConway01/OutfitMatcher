@@ -5,7 +5,7 @@ class OutfitMatcher {
     constructor() {
         this.apiKey = 'OPENROUTER_API_KEY_PLACEHOLDER';
         this.textModel = 'moonshotai/kimi-vl-a3b-thinking:free';
-        this.imageModel = 'google/gemma-2-9b-it:free'; // Using a free text model for image prompts
+        this.imageModel = 'black-forest-labs/flux-schnell-free'; // Free image generation model
         this.currentStream = null;
         this.clearOldApiKeys();
         this.init();
@@ -179,15 +179,12 @@ class OutfitMatcher {
             }
         }
 
-        const aiPrompt = `You are a fashion stylist. Look at this wardrobe/closet image and:
+        const aiPrompt = `Be a fashion stylist. Keep it super short and direct.
 
-1. IDENTIFY the clothing items you can see (shirts, pants, dresses, shoes, etc.)
-2. SUGGEST a complete outfit combination using these specific items
-3. EXPLAIN why this outfit works well together
-4. Keep your response focused on outfit suggestions, not just describing what you see
+What I see: [list 3-4 main items]
+What I recommend: [specific outfit combo]
 
-Format your response like:
-"I can see [list items]. I recommend combining [specific items] because [styling reason]. This creates a [style description] look perfect for [occasion]."`;
+That's it. No long explanations.`;
 
         const requestBody = {
             model: this.textModel,
@@ -353,7 +350,7 @@ Format your response like:
             chatMessages.innerHTML = `
                 <div class="chat-message ai">
                     <div class="message-header">🤖 AI Fashion Assistant</div>
-                    <div class="message-content">I've analyzed your wardrobe! Feel free to ask me questions about the outfit suggestion, like "What shoes would work?" or "Can I wear this to work?"</div>
+                    <div class="message-content">Got this outfit idea! Have any questions? Ask me below. Like this outfit idea? Press "Visualize" to see it come to life!</div>
                 </div>
             `;
             
@@ -504,22 +501,60 @@ Format your response like:
             const imagePrompt = promptData.choices[0].message.content.trim();
             console.log('Generated image prompt:', imagePrompt);
             
-            // Display the generated prompt (no actual image generation to avoid costs)
-            resultDiv.innerHTML = `
-                <div class="result-content">
-                    <h3>🎨 Outfit Visualization Description</h3>
-                    <div class="result-text">${this.formatResult(imagePrompt)}</div>
-                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
-                        <p><strong>💡 Pro Tip:</strong> Copy this description and use it with AI image generators:</p>
-                        <ul style="text-align: left; margin: 0.5rem 0;">
-                            <li><a href="https://www.midjourney.com" target="_blank" style="color: var(--cyber-primary);">Midjourney</a></li>
-                            <li><a href="https://openai.com/dall-e-2" target="_blank" style="color: var(--cyber-primary);">DALL-E</a></li>
-                            <li><a href="https://stability.ai/stable-diffusion" target="_blank" style="color: var(--cyber-primary);">Stable Diffusion</a></li>
-                            <li><a href="https://huggingface.co/spaces/black-forest-labs/FLUX.1-dev" target="_blank" style="color: var(--cyber-primary);">FLUX (Free)</a></li>
-                        </ul>
+            // Now generate the actual image using FLUX
+            const imageResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Content-Type': 'application/json',
+                    'HTTP-Referer': window.location.origin,
+                    'X-Title': 'Outfit Matcher'
+                },
+                body: JSON.stringify({
+                    model: this.imageModel,
+                    messages: [
+                        {
+                            role: "user",
+                            content: imagePrompt
+                        }
+                    ],
+                    max_tokens: 1,
+                    temperature: 0.7
+                })
+            });
+            
+            const imageData = await imageResponse.json();
+            console.log('Image generation response:', imageData);
+            
+            // Check if we got an image URL back
+            if (imageData.choices && imageData.choices[0] && imageData.choices[0].message && imageData.choices[0].message.content) {
+                const imageUrl = imageData.choices[0].message.content.trim();
+                
+                // Display the generated image
+                resultDiv.innerHTML = `
+                    <div class="result-content">
+                        <h3>🎨 Your Outfit Visualization</h3>
+                        <div style="margin: 1rem 0;">
+                            <img src="${imageUrl}" alt="Generated outfit visualization" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,255,255,0.3);">
+                        </div>
+                        <div class="result-text">
+                            <p><strong>Generated from:</strong> ${imagePrompt}</p>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            } else {
+                // Fallback if image generation fails
+                resultDiv.innerHTML = `
+                    <div class="result-content">
+                        <h3>🎨 Outfit Visualization</h3>
+                        <div class="result-text">${this.formatResult(imagePrompt)}</div>
+                        <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                            <p><strong>⚠️ Image generation in progress...</strong></p>
+                            <p>FLUX is creating your outfit image. This may take a moment to process.</p>
+                        </div>
+                    </div>
+                `;
+            }
             
             const regenerateBtn = document.getElementById('regenerateVisualizationBtn');
             if (regenerateBtn) {
