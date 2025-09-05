@@ -23,20 +23,16 @@ class OutfitMatcher {
 
     // API Key Management
     checkApiKey() {
-        this.apiKey = localStorage.getItem('gemini_api_key');
-        if (!this.apiKey) {
-            this.showApiKeyModal();
+        // API key will be injected by GitHub Actions during deployment
+        this.apiKey = 'GEMINI_API_KEY_PLACEHOLDER';
+        
+        // Fallback to localStorage for local development
+        if (this.apiKey === 'GEMINI_API_KEY_PLACEHOLDER') {
+            this.apiKey = localStorage.getItem('gemini_api_key');
+            if (!this.apiKey) {
+                console.warn('No API key found. For local development, add your key to localStorage.');
+            }
         }
-    }
-
-    showApiKeyModal() {
-        const modal = document.getElementById('apiKeyModal');
-        modal.classList.add('show');
-    }
-
-    hideApiKeyModal() {
-        const modal = document.getElementById('apiKeyModal');
-        modal.classList.remove('show');
     }
 
     saveApiKey(key) {
@@ -47,7 +43,6 @@ class OutfitMatcher {
         
         localStorage.setItem('gemini_api_key', key.trim());
         this.apiKey = key.trim();
-        this.hideApiKeyModal();
         this.showSuccess('API key saved successfully!');
         return true;
     }
@@ -305,20 +300,12 @@ class OutfitMatcher {
         });
 
         document.getElementById('visualizeBtn').addEventListener('click', async () => {
-            if (!this.apiKey) {
-                this.showApiKeyModal();
-                return;
-            }
             this.showSection('visualize');
             await this.populateCameraSelect(document.getElementById('cameraSelect'));
             this.startCamera(document.getElementById('video'));
         });
 
         document.getElementById('wardrobeBtn').addEventListener('click', async () => {
-            if (!this.apiKey) {
-                this.showApiKeyModal();
-                return;
-            }
             this.showSection('wardrobe');
             await this.populateCameraSelect(document.getElementById('wardrobeCameraSelect'));
             this.startCamera(document.getElementById('wardrobeVideo'));
@@ -407,12 +394,7 @@ class OutfitMatcher {
             }
         });
 
-        // API Key modal
-        document.getElementById('saveApiKey').addEventListener('click', () => {
-            const input = document.getElementById('apiKeyInput');
-            this.saveApiKey(input.value);
-            input.value = '';
-        });
+        // Removed API Key modal - now using GitHub secrets
 
         // Settings
         document.getElementById('settingsBtn').addEventListener('click', () => {
@@ -432,14 +414,10 @@ class OutfitMatcher {
         });
 
         document.getElementById('clearHistory').addEventListener('click', () => {
-            if (confirm('Are you sure you want to clear all data? This will remove your API key and you\'ll need to set it up again.')) {
+            if (confirm('Are you sure you want to clear all data? This will remove your stored preferences.')) {
                 localStorage.clear();
-                this.apiKey = null;
                 this.showSuccess('All data cleared successfully');
                 document.getElementById('settingsModal').classList.remove('show');
-                setTimeout(() => {
-                    this.showApiKeyModal();
-                }, 1000);
             }
         });
     }
@@ -452,18 +430,15 @@ class OutfitMatcher {
             }
         });
 
-        // Handle Enter key in API key input
-        document.getElementById('apiKeyInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('saveApiKey').click();
-            }
-        });
-
-        document.getElementById('newApiKey').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('updateApiKey').click();
-            }
-        });
+        // Handle Enter key in settings API key input
+        const newApiKeyInput = document.getElementById('newApiKey');
+        if (newApiKeyInput) {
+            newApiKeyInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    document.getElementById('updateApiKey').click();
+                }
+            });
+        }
     }
 }
 

@@ -15,7 +15,7 @@ jobs:
       
     - name: Replace API Key
       run: |
-        sed -i "s/AIzaSyB4l_Ej36TJvMPLMtJ68-h-arTFM38XWAk/${{ secrets.GEMINI_API_KEY }}/g" script.js
+        sed -i "s/GEMINI_API_KEY_PLACEHOLDER/${{ secrets.GEMINI_API_KEY }}/g" script.js
       
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
