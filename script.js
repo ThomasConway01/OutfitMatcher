@@ -179,7 +179,15 @@ class OutfitMatcher {
             }
         }
 
-        const aiPrompt = `Look at this image and tell me what clothing items you can see. Then suggest one outfit combination from these items. Keep it brief and simple.`;
+        const aiPrompt = `You are a fashion stylist. Look at this wardrobe/closet image and:
+
+1. IDENTIFY the clothing items you can see (shirts, pants, dresses, shoes, etc.)
+2. SUGGEST a complete outfit combination using these specific items
+3. EXPLAIN why this outfit works well together
+4. Keep your response focused on outfit suggestions, not just describing what you see
+
+Format your response like:
+"I can see [list items]. I recommend combining [specific items] because [styling reason]. This creates a [style description] look perfect for [occasion]."`;
 
         const requestBody = {
             model: this.textModel,
