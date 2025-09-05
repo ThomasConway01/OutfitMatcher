@@ -129,20 +129,25 @@ class OutfitMatcher {
 
         // Check if API key is properly set
         if (!this.apiKey || this.apiKey === 'GEMINI_API_KEY_PLACEHOLDER') {
-            // Try to get API key from user as fallback
-            const userApiKey = prompt('GitHub secrets not working. Please enter your Gemini API key:');
-            if (userApiKey && userApiKey.trim().length > 10) {
-                this.apiKey = userApiKey.trim();
-                localStorage.setItem('gemini_api_key', this.apiKey);
+            // Check localStorage first
+            const storedKey = localStorage.getItem('gemini_api_key');
+            if (storedKey && storedKey.trim().length > 10) {
+                this.apiKey = storedKey.trim();
             } else {
+                // Show error message with instructions
                 resultDiv.innerHTML = `
                     <div class="error-content">
                         <h3>❌ API Key Missing</h3>
-                        <p>GitHub secrets not configured properly. Please:</p>
-                        <ol style="text-align: left; margin: 1rem 0;">
-                            <li>Check your GEMINI_API_KEY secret in GitHub</li>
-                            <li>Or refresh and enter your API key when prompted</li>
-                        </ol>
+                        <p>GitHub secrets not configured properly.</p>
+                        <div style="margin: 1rem 0; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                            <p><strong>To fix this:</strong></p>
+                            <ol style="text-align: left; margin: 0.5rem 0;">
+                                <li>Get your API key from <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: var(--cyber-primary);">Google AI Studio</a></li>
+                                <li>Enter it below:</li>
+                            </ol>
+                            <input type="password" id="tempApiKey" placeholder="Paste your Gemini API key here" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0; background: var(--cyber-bg); border: 2px solid var(--cyber-border); color: var(--cyber-text); border-radius: 4px;">
+                            <button onclick="window.outfitMatcher.setTempApiKey()" style="padding: 0.5rem 1rem; background: var(--cyber-primary); color: var(--cyber-bg); border: none; border-radius: 4px; cursor: pointer;">Save & Try Again</button>
+                        </div>
                     </div>
                 `;
                 loadingDiv.style.display = 'none';
@@ -275,6 +280,29 @@ class OutfitMatcher {
         console.log('Success:', message);
     }
 
+    // Method to set API key from the temporary input
+    setTempApiKey() {
+        const input = document.getElementById('tempApiKey');
+        if (input && input.value && input.value.trim().length > 10) {
+            this.apiKey = input.value.trim();
+            localStorage.setItem('gemini_api_key', this.apiKey);
+            
+            // Clear the input and show success
+            input.value = '';
+            
+            // Show success message
+            const resultDiv = document.getElementById('wardrobeResult');
+            resultDiv.innerHTML = `
+                <div class="result-content">
+                    <h3>✅ API Key Saved</h3>
+                    <p>API key saved successfully! You can now scan your wardrobe.</p>
+                </div>
+            `;
+        } else {
+            alert('Please enter a valid API key (at least 10 characters)');
+        }
+    }
+
     // Event Listeners
     setupEventListeners() {
         // Navigation
@@ -355,5 +383,5 @@ class OutfitMatcher {
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new OutfitMatcher();
+    window.outfitMatcher = new OutfitMatcher();
 });
