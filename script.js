@@ -233,13 +233,6 @@ class OutfitMatcher {
                 
                 // Show chat interface
                 this.showChatInterface();
-            } else if (data.candidates && data.candidates[0] && data.candidates[0].finishReason === 'SAFETY') {
-                resultDiv.innerHTML = `
-                    <div class="error-content">
-                        <h3>⚠️ Content Filtered</h3>
-                        <p>The image was filtered for safety reasons. Please try a different photo.</p>
-                    </div>
-                `;
             } else {
                 console.error('Unexpected response structure:', data);
                 resultDiv.innerHTML = `
