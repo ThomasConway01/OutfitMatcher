@@ -5,7 +5,7 @@ class OutfitMatcher {
     constructor() {
         this.apiKey = 'OPENROUTER_API_KEY_PLACEHOLDER';
         this.textModel = 'moonshotai/kimi-vl-a3b-thinking:free';
-        this.imageModel = 'black-forest-labs/flux-schnell-free'; // Free image generation model
+        this.imageModel = 'stabilityai/stable-diffusion-xl-base-1.0'; // Working image generation model
         this.currentStream = null;
         this.clearOldApiKeys();
         this.init();
