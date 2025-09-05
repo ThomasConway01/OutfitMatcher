@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outfit Matcher</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <button id="homeBtn">Home</button>
+        <button id="visualizeBtn">Visualize Outfit</button>
+        <button id="wardrobeBtn">Wardrobe Scanner</button>
+    </nav>
+
+    <div id="home" class="section">
+        <h1>Welcome to Outfit Matcher</h1>
+        <p>Use AI to analyze your clothing and get outfit suggestions!</p>
+        <p>Click the buttons above to get started.</p>
+    </div>
+
+    <div id="visualize" class="section" style="display:none;">
+        <h2>Visualize Outfit</h2>
+        <p>Take a photo of a clothing item to get outfit suggestions.</p>
+        <video id="video" autoplay></video>
+        <button id="capture">Capture</button>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <div id="result">Results will appear here after capture.</div>
+    </div>
+
+    <div id="wardrobe" class="section" style="display:none;">
+        <h2>Wardrobe Scanner</h2>
+        <p>Take a photo of your wardrobe to get combination ideas.</p>
+        <video id="wardrobeVideo" autoplay></video>
+        <button id="scanWardrobe">Scan Wardrobe</button>
+        <div id="wardrobeResult">Results will appear here after scan.</div>
+    </div>
+
+    <script src="script.js?v=1"></script>
+</body>
+</html>
